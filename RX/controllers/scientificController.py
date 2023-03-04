@@ -45,6 +45,7 @@ def list_sb_stock(request):
     # print(request.auth)
     print(request.user.get_all_permissions())
     auth_user = User.objects.get(id=request.auth['id'])
+    print(auth_user.userSB.id)
     if User.has_perm(perm='RX.view_scientificofficestock', self=auth_user):
         scientific_stock = ScientificOfficeStock.objects.all()
         if scientific_stock:
