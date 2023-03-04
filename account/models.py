@@ -1,3 +1,5 @@
+import random
+
 from django.db import models
 
 # Create your models here.
@@ -6,7 +8,7 @@ import uuid
 from django.contrib.auth.models import UserManager, AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from RX.models.ScientificOfficeModel import Entity
+from RX.models.ScientificOfficeModel import Entity, ScientificOffice
 
 
 # from utils.utils_functions import generate_random_otp
@@ -42,6 +44,13 @@ class CustomUserManager(UserManager):
         return user
 
 
+class UsersType(Entity):
+    type = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f'{self.type}'
+
+
 class User(Entity, AbstractUser):
     GENDER_CHOICES = (
         ('Male', 'Male'), ('Female', 'Female')
@@ -55,6 +64,8 @@ class User(Entity, AbstractUser):
     gender = models.CharField(max_length=10, null=True, blank=True, choices=GENDER_CHOICES)
     phone = models.CharField(max_length=17, null=True, blank=True)
     birth_date = models.DateField(null=True, blank=True)
+    userType = models.ForeignKey(UsersType, on_delete=models.SET_NULL, null=True)
+    userSB = models.ForeignKey(ScientificOffice, on_delete=models.DO_NOTHING, null=True)
     REQUIRED_FIELDS = []
     objects = CustomUserManager()
 
@@ -62,15 +73,19 @@ class User(Entity, AbstractUser):
         return self.email
 
     def has_perm(self, perm, obj=None):
-        return perm in self.get_group_permissions()
+        return perm in self.get_all_permissions()
 
     def has_module_perms(self, app_label):
         return True
 
-#
-# class Otp(models.Model):
-#     number = models.IntegerField(default=generate_random_otp)
-#     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='otp')
-#
-#     def __str__(self):
-#         return f'{self.user} ||| {self.number}'
+
+def generate_random_otp():
+    return random.randint(1000, 9999)
+
+
+class Otp(models.Model):
+    number = models.IntegerField(default=generate_random_otp)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='otp')
+
+    def __str__(self):
+        return f'{self.user} ||| {self.number}'

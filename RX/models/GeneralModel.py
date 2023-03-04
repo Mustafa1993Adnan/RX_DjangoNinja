@@ -17,3 +17,11 @@ class Entity(models.Model):
     #     null=True,
     #     editable=False, default=settings.AUTH_USER_MODEL
     # )
+
+
+class Manufactures(Entity):
+    ManufactureName = models.CharField(max_length=50)
+    Country = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.ManufactureName
