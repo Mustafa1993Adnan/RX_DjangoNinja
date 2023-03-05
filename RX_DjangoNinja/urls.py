@@ -19,11 +19,13 @@ from ninja import NinjaAPI, Router
 
 # from RX.views import scientific_controller
 # from account.views import api_pet
+from RX.controllers.distributorWarehouseController import dw_controller
 from RX.controllers.scientificController import sb_stock_controller
 from account.views import account_controller
 
 api = NinjaAPI()
 api.add_router('/scientific_bureau', sb_stock_controller)
+api.add_router('/Distributor_warehouse', dw_controller)
 api.add_router('/account', account_controller)
 # api.add_router('/signup', api_pet)
 urlpatterns = [

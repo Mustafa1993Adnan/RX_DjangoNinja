@@ -3,6 +3,8 @@ import datetime
 from ninja import Schema
 from pydantic.types import UUID4
 
+from RX.models import ScientificOfficeStock
+
 
 class ManufacturesOut(Schema):
     ManufactureName: str
@@ -32,3 +34,14 @@ class SBStockOut(Schema):
     ProductDate: datetime.date
     ExpireDate: datetime.date
     Quantity: int
+
+
+class SBInvoiceInBody(Schema):
+    InvoiceNumber: int
+    invoice_date: datetime.date
+    InvoiceDW: UUID4
+    PaymentTerms: int
+    DueDate: datetime.date
+    ProductName: UUID4
+    Quantitiy: int
+    SellPrice: float

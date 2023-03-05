@@ -41,7 +41,7 @@ class ScientificOfficeStock(Entity):
     Quantity = models.IntegerField()
 
     def __str__(self):
-        return f'{self.ItemID} || {self.Price}'
+        return f'{self.ItemID} || Price {self.Price}'
 
 
 class DistributorWarehouse(Entity):
@@ -55,15 +55,17 @@ class DistributorWarehouse(Entity):
 
 
 class Invoices(Entity):
+    # InvoiceNumber_auto = models.IntegerField(unique=True)
     InvoiceNumber = models.IntegerField()
     InvoiceDate = models.DateTimeField(auto_now=True, editable=False)
-    InvoiceDW = models.ForeignKey(DistributorWarehouse, on_delete=models.DO_NOTHING)
+    InvoiceDW = models.ForeignKey(DistributorWarehouse, on_delete=models.DO_NOTHING, null=True)
     PaymentTerms = models.PositiveIntegerField(default=0)
     ContactDetails = models.CharField(max_length=100, blank=True, null=True)
     DueDate = models.DateField()
     ProductName = models.ForeignKey(ScientificOfficeStock, on_delete=models.DO_NOTHING)
     Quantitiy = models.PositiveIntegerField()
     SellPrice = models.DecimalField(decimal_places=2, max_digits=10)
+
     # Note = models.TextField(blank=True, null=True)
 
     def __str__(self):

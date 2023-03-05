@@ -2,8 +2,8 @@ from django.shortcuts import get_object_or_404
 from ninja import Router, Schema
 from pydantic.types import UUID4
 
-from RX.models import ScientificOfficeStock, ScientificOffice
-from RX.schemas.SBItemStock import SBStockOut, ScientificOfficeOut
+from RX.models import ScientificOfficeStock, ScientificOffice, ScientificOfficeItems, Invoices, DistributorWarehouse
+from RX.schemas.SBItemStock import SBStockOut, ScientificOfficeOut, SBInvoiceInBody
 # from RX.views import MessageOut
 from account.authorization import TokenAuthentication
 from account.models import User
@@ -40,14 +40,39 @@ def get_sb_stock_by_id(request, id: UUID4):
         return 403, {'msg': "You don't have permission to access this endpoint"}
 
 
-@sb_stock_controller.get('/list_items/', auth=TokenAuthentication(), response={200: list[SBStockOut], 404: MessageOut})
+@sb_stock_controller.get('/list_items_all/', auth=TokenAuthentication(),
+                         response={200: list[SBStockOut], 404: MessageOut})
+def list_sb_stock_all(request):
+    # print(request.auth)
+    print(request.user.get_all_permissions())
+    auth_user = User.objects.get(id=request.auth['id'])
+    print(auth_user.userSB.id)
+    # so = ScientificOffice.objects.get(id=auth_user.userSB.id)
+    # print(so.id)
+    # soi = ScientificOfficeItems.objects.get(ScientificOfficeID=so.id)
+    # print(soi.id)
+    if User.has_perm(perm='RX.view_scientificofficestock', self=auth_user):
+        scientific_stock = ScientificOfficeStock.objects.all()
+        if scientific_stock:
+            return 200, scientific_stock
+        else:
+            return 404, {'msg': "There are no SB yet."}
+    else:
+        return 403, {'msg': "You don't have permission to access this endpoint"}
+
+
+@sb_stock_controller.get('/list_items_sb_id/', auth=TokenAuthentication(), response={200: SBStockOut, 404: MessageOut})
 def list_sb_stock(request):
     # print(request.auth)
     print(request.user.get_all_permissions())
     auth_user = User.objects.get(id=request.auth['id'])
     print(auth_user.userSB.id)
+    so = ScientificOffice.objects.get(id=auth_user.userSB.id)
+    print(so.id)
+    soi = ScientificOfficeItems.objects.get(ScientificOfficeID=so.id)
+    print(soi.id)
     if User.has_perm(perm='RX.view_scientificofficestock', self=auth_user):
-        scientific_stock = ScientificOfficeStock.objects.all()
+        scientific_stock = ScientificOfficeStock.objects.get(ItemID=soi.id)
         if scientific_stock:
             return 200, scientific_stock
         else:
@@ -68,6 +93,24 @@ def list_sb_stock(request, id: UUID4):
             return 200, scientific_stock
         else:
             return 404, {'msg': "There are no SB yet."}
+    else:
+        return 403, {'msg': "You don't have permission to access this endpoint"}
+
+
+@sb_stock_controller.post('/addInvoices/', auth=TokenAuthentication(),
+                          response={200: MessageOut, 404: MessageOut})
+def add_invoice(request, payload: SBInvoiceInBody):
+    auth_user = User.objects.get(id=request.auth['id'])
+    if User.has_perm(perm='RX.add_invoices', self=auth_user):
+        item_stock_instance = ScientificOfficeStock.objects.get(id=payload.ProductName)
+        distributor_warehouse = DistributorWarehouse.objects.get(id=payload.InvoiceDW)
+        invoice = Invoices.objects.create(InvoiceNumber=payload.InvoiceNumber, InvoiceDate=payload.invoice_date,
+                                          InvoiceDW=distributor_warehouse, PaymentTerms=payload.PaymentTerms,
+                                          DueDate=payload.DueDate, ProductName=item_stock_instance,
+                                          Quantitiy=payload.Quantitiy, SellPrice=payload.SellPrice)
+        invoice.save()
+
+        return 200, {'msg': "The invoice created successfully"}
     else:
         return 403, {'msg': "You don't have permission to access this endpoint"}
 
