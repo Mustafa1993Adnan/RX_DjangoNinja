@@ -55,9 +55,8 @@ class DistributorWarehouse(Entity):
 
 
 class Invoices(Entity):
-    # InvoiceNumber_auto = models.IntegerField(unique=True)
     InvoiceNumber = models.IntegerField()
-    InvoiceDate = models.DateTimeField(auto_now=True, editable=False)
+    InvoiceDate = models.DateTimeField(auto_now_add=True, editable=False)
     InvoiceDW = models.ForeignKey(DistributorWarehouse, on_delete=models.DO_NOTHING, null=True)
     PaymentTerms = models.PositiveIntegerField(default=0)
     ContactDetails = models.CharField(max_length=100, blank=True, null=True)

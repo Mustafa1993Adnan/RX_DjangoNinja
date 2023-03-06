@@ -4,6 +4,7 @@ from ninja import Schema
 from pydantic.types import UUID4
 
 from RX.models import ScientificOfficeStock
+from RX.schemas.DWSchema import DWOut
 
 
 class ManufacturesOut(Schema):
@@ -43,5 +44,17 @@ class SBInvoiceInBody(Schema):
     PaymentTerms: int
     DueDate: datetime.date
     ProductName: UUID4
+    Quantitiy: int
+    SellPrice: float
+
+
+class SBInvoiceOut(Schema):
+    id: UUID4
+    InvoiceNumber: int
+    InvoiceDate: datetime.datetime = None
+    InvoiceDW: DWOut
+    PaymentTerms: int
+    DueDate: datetime.date
+    ProductName: SBStockOut = None
     Quantitiy: int
     SellPrice: float
