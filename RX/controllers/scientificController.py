@@ -103,6 +103,10 @@ def add_invoice(request, payload: SBInvoiceInBody):
     auth_user = User.objects.get(id=request.auth['id'])
     if User.has_perm(perm='RX.add_invoices', self=auth_user):
         item_stock_instance = ScientificOfficeStock.objects.get(id=payload.ProductName)
+        print(item_stock_instance.Quantity)
+        item_stock_instance.Quantity = item_stock_instance.Quantity - payload.Quantitiy
+        print(item_stock_instance.Quantity)
+        item_stock_instance.save()
         distributor_warehouse = DistributorWarehouse.objects.get(id=payload.InvoiceDW)
         invoice = Invoices.objects.create(InvoiceNumber=payload.InvoiceNumber, InvoiceDate=payload.invoice_date,
                                           InvoiceDW=distributor_warehouse, PaymentTerms=payload.PaymentTerms,
