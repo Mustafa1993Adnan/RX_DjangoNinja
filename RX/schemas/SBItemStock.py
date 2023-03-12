@@ -58,3 +58,8 @@ class SBInvoiceOut(Schema):
     ProductName: SBStockOut = None
     Quantitiy: int
     SellPrice: float
+
+
+class SBOrderOut(Schema):
+    invoice_details: SBInvoiceOut
+    dw_details: DWOut

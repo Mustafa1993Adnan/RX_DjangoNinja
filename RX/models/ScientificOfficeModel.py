@@ -69,3 +69,16 @@ class Invoices(Entity):
 
     def __str__(self):
         return f'{self.InvoiceNumber} || {self.InvoiceDW} '
+
+
+class Order(Entity):
+    OrderDW = models.ForeignKey(DistributorWarehouse, on_delete=models.DO_NOTHING, null=True, blank=True)
+    Invoices = models.ManyToManyField(Invoices, related_name='invoice_order', null=True,
+                                      blank=True)
+
+    # user = models.ManyToManyField(User, related_name='invoice_order', blank=True)
+
+    # Scientific_rep = models.ForeignKey(User, related_name='rep_user', on_delete=models.DO_NOTHING, blank=True)
+
+    def __str__(self):
+        return f' {self.OrderDW}    '
