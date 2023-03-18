@@ -178,7 +178,7 @@ def get_invoice_by_id(request, id: UUID4):
 def get_orders(request):
     print(request.user.get_all_permissions())
     auth_user = User.objects.get(id=request.auth['id'])
-    if User.has_perm(perm='RX.view_orders', self=auth_user):
+    if User.has_perm(perm='RX.view_order', self=auth_user):
         order = get_object_or_404(Order)
         if order:
             return 200, order
