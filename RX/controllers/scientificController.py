@@ -173,12 +173,26 @@ def get_invoice_by_id(request, id: UUID4):
         return 403, {'msg': "You don't have permission to access this endpoint"}
 
 
+@sb_stock_controller.delete('/delete_invoice/{id}', auth=TokenAuthentication(),
+                            response={200: MessageOut, 403: MessageOut}
+                            )
+def delete_invoice(request, id: UUID4):
+    print(request.user.get_all_permissions())
+    auth_user = User.objects.get(id=request.auth['id'])
+    if User.has_perm(perm='RX.delete_invoices', self=auth_user):
+        invoice = get_object_or_404(Invoices, id=id)
+        invoice.delete()
+        return 200, {'msg': "Deleted successfully"}
+    else:
+        return 403, {'msg': "You don't have permission to access this endpoint"}
+
+
 @sb_stock_controller.get('/orders/', auth=TokenAuthentication(),
                          response={200: SBOrderOut, 403: MessageOut})
 def get_orders(request):
     print(request.user.get_all_permissions())
     auth_user = User.objects.get(id=request.auth['id'])
-    if User.has_perm(perm='RX.view_orders', self=auth_user):
+    if User.has_perm(perm='RX.view_order', self=auth_user):
         order = get_object_or_404(Order)
         if order:
             return 200, order
@@ -186,7 +200,6 @@ def get_orders(request):
             return 404, {'msg': "There are no invoice yet."}
     else:
         return 403, {'msg': "You don't have permission to access this endpoint"}
-
 
 # auth_user = User.objects.get(id=request.auth['id'])
 # if User.has_perm(perm='RX.add_invoices', self=auth_user):

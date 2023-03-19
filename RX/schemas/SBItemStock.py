@@ -61,5 +61,5 @@ class SBInvoiceOut(Schema):
 
 
 class SBOrderOut(Schema):
-    invoice_details: SBInvoiceOut
-    dw_details: DWOut
+    Invoices: list[SBInvoiceOut]
+    OrderDW: DWOut
